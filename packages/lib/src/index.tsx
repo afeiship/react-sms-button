@@ -127,7 +127,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   };
 
   render() {
-    const { className, children, as, count, min, template, onChange, ...rest } = this.props;
+    const { className, children, as, asProps, count, min, template, onChange, ...rest } = this.props;
     const RootComponent = as as ElementType;
 
     return (
@@ -136,7 +136,9 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
         onClick={this.handleClick}
         data-component={CLASS_NAME}
         className={cx(CLASS_NAME, className)}
-        {...rest}>
+        {...rest}
+        {...asProps}
+      >
         {this.template}
       </RootComponent>
     );
