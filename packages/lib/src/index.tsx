@@ -49,7 +49,6 @@ export type ReactSmsSendProps = {
   onChange?: (args: TemplateArgs) => void;
 } & Omit<HTMLAttributes<HTMLElement>, 'as' | 'children'>;
 
-
 type ReactSmsSendState = TemplateArgs;
 
 export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsSendState> {
@@ -60,6 +59,8 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
     count: 30,
     min: 1,
   };
+
+  private timer: any;
 
   state = {
     status: 'init',
@@ -80,15 +81,15 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   componentDidUpdate(prevProps: Readonly<ReactSmsSendProps>, prevState: Readonly<ReactSmsSendState>) {
     const isStateCountChanged = prevState.count !== this.state.count;
     const isStatusChanged = prevState.status !== this.state.status;
+    const isCountUpdated = prevProps.count !== this.props.count;
 
-    if (isStateCountChanged || isStatusChanged) {
-      const { onChange } = this.props;
-      if (onChange) onChange(this.state);
-    }
+    if (isStateCountChanged || isStatusChanged) this.props.onChange?.(this.state);
+    if (isCountUpdated) this.setState({ count: this.props.count });
+  }
 
-    if (prevProps.count !== this.props.count) {
-      this.setState({ count: this.props.count });
-    }
+  componentWillUnmount() {
+    this.reset();
+    this.clear();
   }
 
   handleClick = () => {
@@ -106,10 +107,10 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   sending = () => {
     const { min } = this.props;
     this.setState({ status: 'loading' });
-    const timer = setInterval(() => {
+    this.timer = setInterval(() => {
       const { count: count } = this.state;
       if (count === min) {
-        clearInterval(timer);
+        this.clear();
         this.setState({ status: 'done' });
       } else {
         this.setState({ count: count! - 1 });
@@ -119,6 +120,10 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
 
   resend = () => {
     this.reset(this.sending);
+  };
+
+  clear = () => {
+    if (this.timer) clearInterval(this.timer);
   };
 
   render() {
