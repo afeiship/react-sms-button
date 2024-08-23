@@ -7,7 +7,7 @@ export type Status = 'init' | 'loading' | 'done';
 export type TemplateArgs = {
   status: Status;
   count?: number;
-}
+};
 
 export type ReactSmsSendProps = {
   /**
@@ -22,11 +22,11 @@ export type ReactSmsSendProps = {
   /**
    * The element type to render as.
    */
-  as?: ElementType,
+  as?: ElementType;
   /**
    * The props for the element type.
    */
-  asProps?: any,
+  asProps?: any;
   /**
    * The max count to resend.
    * @default 30
@@ -78,7 +78,10 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
     return template?.({ status, count });
   }
 
-  componentDidUpdate(prevProps: Readonly<ReactSmsSendProps>, prevState: Readonly<ReactSmsSendState>) {
+  componentDidUpdate(
+    prevProps: Readonly<ReactSmsSendProps>,
+    prevState: Readonly<ReactSmsSendState>
+  ) {
     const isStateCountChanged = prevState.count !== this.state.count;
     const isStatusChanged = prevState.status !== this.state.status;
     const isCountUpdated = prevProps.count !== this.props.count;
@@ -92,11 +95,13 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
     this.clear();
   }
 
-  handleClick = () => {
+  handleClick = (e) => {
+    const { onClick } = this.props;
     const { status } = this.state;
     if (this.isDisabled) return;
     if (status === 'init') this.sending();
     if (status === 'done') this.resend();
+    onClick?.(e);
   };
 
   // public methods
@@ -127,7 +132,8 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   };
 
   render() {
-    const { className, children, as, asProps, count, min, template, onChange, ...rest } = this.props;
+    const { className, children, as, asProps, count, min, template, onChange, onClick, ...rest } =
+      this.props;
     const RootComponent = as as ElementType;
 
     return (
@@ -137,8 +143,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
         data-component={CLASS_NAME}
         className={cx(CLASS_NAME, className)}
         {...rest}
-        {...asProps}
-      >
+        {...asProps}>
         {this.template}
       </RootComponent>
     );
