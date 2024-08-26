@@ -28,6 +28,10 @@ export type ReactSmsSendProps = {
    */
   asProps?: any;
   /**
+   * If the as(button) component is disabled.
+   */
+  disabled?: boolean;
+  /**
    * The max count to resend.
    * @default 30
    */
@@ -68,8 +72,9 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   } as ReactSmsSendState;
 
   get isDisabled() {
+    const { disabled } = this.props;
     const { status } = this.state;
-    return status === 'loading';
+    return status === 'loading' || disabled;
   }
 
   get template() {
@@ -80,7 +85,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
 
   componentDidUpdate(
     prevProps: Readonly<ReactSmsSendProps>,
-    prevState: Readonly<ReactSmsSendState>
+    prevState: Readonly<ReactSmsSendState>,
   ) {
     const isStateCountChanged = prevState.count !== this.state.count;
     const isStatusChanged = prevState.status !== this.state.status;
@@ -132,7 +137,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   };
 
   render() {
-    const { className, children, as, asProps, count, min, template, onChange, onClick, ...rest } =
+    const { className, children, as, asProps, count, min, template, onChange, onClick, disabled, ...rest } =
       this.props;
     const RootComponent = as as ElementType;
 
