@@ -1,5 +1,7 @@
 import cx from 'classnames';
 import React, { ReactNode, Component, HTMLAttributes, ElementType } from 'react';
+import { ReactHarmonyEvents } from '@jswork/harmony-events';
+import type { EventMittNamespace } from '@jswork/event-mitt';
 
 const CLASS_NAME = 'react-sms-send';
 export type Status = 'init' | 'loading' | 'done';
@@ -10,6 +12,10 @@ export type TemplateArgs = {
 };
 
 export type ReactSmsSendProps = {
+  /**
+   * The unique id for component.
+   */
+  name?: string;
   /**
    * The extended className for component.
    * @default ''
@@ -58,13 +64,17 @@ type ReactSmsSendState = TemplateArgs;
 export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsSendState> {
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
+  static event: EventMittNamespace.EventMitt;
+  static events = ['reset'];
   static defaultProps = {
+    name: '@',
     as: 'button',
     count: 30,
     min: 1,
   };
 
   private timer: any;
+  private harmonyEvents: ReactHarmonyEvents | null = null;
 
   state = {
     status: 'init',
@@ -83,6 +93,11 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
     return template?.({ status, count });
   }
 
+  componentDidMount() {
+    this.harmonyEvents = ReactHarmonyEvents.create(this);
+
+  }
+
   componentDidUpdate(
     prevProps: Readonly<ReactSmsSendProps>,
     prevState: Readonly<ReactSmsSendState>,
@@ -98,6 +113,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   componentWillUnmount() {
     this.reset();
     this.clear();
+    this.harmonyEvents?.destroy();
   }
 
   handleClick = (e) => {
