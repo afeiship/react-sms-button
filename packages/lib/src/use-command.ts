@@ -6,10 +6,12 @@ const useCommand = (inName?: string) => {
     RcComponent.event?.emit(`${name}:${command}`, ...args);
 
   // the command repository:
-  const reset = (index: number) => execute('reset', index);
+  const reset = () => execute('reset');
+  const resend = () => execute('resend');
 
   return {
     reset,
+    resend,
   };
 };
 

@@ -65,7 +65,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   static displayName = CLASS_NAME;
   static version = '__VERSION__';
   static event: EventMittNamespace.EventMitt;
-  static events = ['reset'];
+  static events = ['reset', 'resend'];
   static defaultProps = {
     name: '@',
     as: 'button',
@@ -128,6 +128,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   // public methods
   reset = (callback?: () => void) => {
     this.setState({ status: 'init', count: this.props.count }, callback);
+    this.clear();
   };
 
   sending = () => {

@@ -1,9 +1,10 @@
-import ReactSmsSend, { TemplateArgs } from '@jswork/react-sms-send/src/main';
+import ReactSmsSend, { useCommand, TemplateArgs } from '@jswork/react-sms-send/src/main';
 import '@jswork/react-sms-send/src/style.scss';
 import { useState } from 'react';
 
 function App() {
   const [count, setCount] = useState(6);
+  const cmd = useCommand('sms1');
   const template = ({ status, count }: TemplateArgs) => {
     return <>
       {status === 'init' && <span>获取验证码</span>}
@@ -20,6 +21,7 @@ function App() {
       <h3>Current count is: {count}</h3>
       <div className="x-5">
         <ReactSmsSend
+          name="sms1"
           count={count}
           template={template}
           onChange={(args) => {
@@ -31,6 +33,8 @@ function App() {
         </ReactSmsSend>
 
         <button className="btn btn-sm btn-secondary" onClick={() => setCount(10)}>Reset Count to 10</button>
+
+        <button className="btn btn-sm btn-error" onClick={() => cmd.reset()}> Stop when Error</button>
       </div>
     </div>
   );
