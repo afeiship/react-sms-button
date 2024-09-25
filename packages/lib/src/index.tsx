@@ -57,6 +57,11 @@ export type ReactSmsSendProps = {
    * @param args
    */
   onChange?: (args: TemplateArgs) => void;
+  /**
+   * The callback function when before send.
+   * @returns boolean or Promise<boolean>
+   */
+  onBeforeSend?: () => Promise<boolean> | boolean;
 } & Omit<HTMLAttributes<HTMLElement>, 'as' | 'children'>;
 
 type ReactSmsSendState = TemplateArgs;
@@ -71,6 +76,7 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
     as: 'button',
     count: 30,
     min: 1,
+    onBeforeSend: () => true,
   };
 
   private timer: any;
@@ -116,10 +122,11 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
     this.harmonyEvents?.destroy();
   }
 
-  handleClick = (e) => {
-    const { onClick } = this.props;
+  handleClick = async (e) => {
+    const { onBeforeSend, onClick } = this.props;
     const { status } = this.state;
-    if (this.isDisabled) return;
+    const canSend = await onBeforeSend?.();
+    if (this.isDisabled || !canSend) return;
     if (status === 'init') this.sending();
     if (status === 'done') this.resend();
     onClick?.(e);
@@ -154,7 +161,20 @@ export default class ReactSmsSend extends Component<ReactSmsSendProps, ReactSmsS
   };
 
   render() {
-    const { className, children, as, asProps, count, min, template, onChange, onClick, disabled, ...rest } =
+    const {
+      className,
+      children,
+      as,
+      asProps,
+      count,
+      min,
+      template,
+      onBeforeSend,
+      onChange,
+      onClick,
+      disabled,
+      ...rest
+    } =
       this.props;
     const RootComponent = as as ElementType;
 
